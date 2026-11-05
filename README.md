@@ -81,7 +81,7 @@ This evidence-aware integration connected public spatial-transcriptomics data an
 The numbered Python and PBS files form the HPC pipeline in execution order. The stages are grouped by the biological question they answer; the missing `03` reflects a removed intermediate stage rather than a missing analysis step.
 
 | Analysis group | Files | Purpose |
-| --- | --- |
+| --- | --- | --- |
 | Data preparation and annotation | `00_*`–`02_*` | Load Space Ranger output, apply quality control, and attach cell-type and anatomical labels |
 | Sampling and shared inputs | `04_*`–`05_*` | Draw and validate the 30,000-bin stratified sample and prepare common inference inputs |
 | Non-spatial reference method | `06_*` | Run GRNBoost2 in target-gene chunks, merge results, apply cisTarget/AUCell, and build recurrent regulons |
