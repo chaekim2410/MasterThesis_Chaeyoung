@@ -1,0 +1,58 @@
+#!/bin/bash
+#PBS -N grnboost2_chunk_validation
+#PBS -l nodes=1:ppn=8
+#PBS -l walltime=24:00:00
+#PBS -l mem=64gb
+#PBS -j oe
+#PBS -o /data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis/results/06_grnboost2/validation/grnboost2_chunk_validation.log
+
+set -euo pipefail
+
+PROJECT_ROOT="/data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis"
+PY_SCRIPT="${PROJECT_ROOT}/06a_grnboost2_chunk_test.py"
+OUTDIR="${PROJECT_ROOT}/results/06_grnboost2/validation"
+
+mkdir -p "${OUTDIR}"
+
+cd "${PROJECT_ROOT}"
+
+echo "========================================"
+echo "GRNBoost2 multi-seed chunk validation"
+echo "========================================"
+echo "Job started: $(date)"
+echo "Hostname: $(hostname)"
+echo "Working directory: $(pwd)"
+echo "Python script: ${PY_SCRIPT}"
+echo "Output directory: ${OUTDIR}"
+echo "PBS job ID: ${PBS_JOBID:-NA}"
+echo "========================================"
+
+module load Miniconda3/23.10.0-1
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate pyscenic_env
+
+
+echo "Python: $(which python)"
+python --version
+
+# Dask 임시 파일 위치
+export DASK_TEMPORARY_DIRECTORY="${TMPDIR:-/tmp}/${USER}/grnboost2_chunk_validation_${PBS_JOBID:-manual}"
+mkdir -p "${DASK_TEMPORARY_DIRECTORY}"
+
+# Python 코드 내부에서 읽는 worker 수
+export NUM_WORKERS=8
+
+echo "NUM_WORKERS=${NUM_WORKERS}"
+echo "DASK_TEMPORARY_DIRECTORY=${DASK_TEMPORARY_DIRECTORY}"
+echo "========================================"
+
+python -u "${PY_SCRIPT}"
+
+status=$?
+
+echo "========================================"
+echo "Python exit status: ${status}"
+echo "Job finished: $(date)"
+echo "========================================"
+
+exit "${status}"

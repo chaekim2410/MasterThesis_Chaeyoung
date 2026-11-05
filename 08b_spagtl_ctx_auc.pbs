@@ -1,0 +1,28 @@
+#!/bin/bash
+#PBS -N spagtl_ctx
+#PBS -l walltime=72:00:00
+#PBS -l nodes=1:ppn=16
+#PBS -l mem=64gb
+#PBS -j oe
+#PBS -o /data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis/results/08_spagtl/08_spagtl_ctx_only.out
+
+set -euo pipefail
+cd /data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis
+
+module load Miniconda3/23.10.0-1
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate pyscenic_env
+
+echo "======================================"
+echo "SpaGTL CTX/AUC from core"
+echo "Started : $(date)"
+echo "Host    : $(hostname)"
+echo "Python  : $(which python)"
+echo "======================================"
+
+
+python 08b_spagtl_ctx_auc.py
+
+echo "======================================"
+echo "Finished : $(date)"
+echo "======================================"

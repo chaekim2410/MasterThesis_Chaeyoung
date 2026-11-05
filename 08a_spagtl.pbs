@@ -1,0 +1,36 @@
+#!/bin/bash
+#PBS -N spagtl_run10times
+#PBS -l walltime=48:00:00
+#PBS -l nodes=1:ppn=16:gpus=1
+#PBS -l mem=128gb
+#PBS -j oe
+#PBS -o /data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis/results/08_spagtl
+#PBS -e /data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis/results/08_spagtl
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+
+module load CUDA/12.1.1
+module load Miniconda3/23.10.0-1
+
+source $(conda info --base)/etc/profile.d/conda.sh
+
+conda activate /scratch/gent/482/vsc48280/conda_envs/spagtl_env
+
+cd /data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis
+
+echo "================================="
+echo "HOSTNAME:"
+hostname
+
+echo "================================="
+echo "GPU INFO:"
+nvidia-smi
+
+echo "================================="
+echo "PYTHON:"
+which python
+
+python /data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis/08a_spagtl_core.py
+
+

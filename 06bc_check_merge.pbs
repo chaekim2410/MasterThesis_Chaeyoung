@@ -1,0 +1,25 @@
+#!/bin/bash
+#PBS -N merge_run10
+#PBS -l nodes=1:ppn=1
+#PBS -l mem=20gb
+#PBS -l walltime=01:00:00
+#PBS -j oe
+
+set -euo pipefail
+cd "$PBS_O_WORKDIR"
+
+module load Miniconda3/23.10.0-1
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate pyscenic_env
+
+echo "Job started at: $(date)"
+echo "Running on: $(hostname)"
+echo "Working dir: $PWD"
+
+echo "[1] Check chunks"
+python 06b_check_chunked_grnboost2.py
+
+echo "[2] Merge chunks"
+python 06c_merge_chunk_grnboost2.py
+
+echo "Job finished at: $(date)"

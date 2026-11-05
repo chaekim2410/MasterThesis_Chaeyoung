@@ -1,0 +1,18 @@
+#!/bin/bash
+#PBS -N 01_postfilter_analysis
+#PBS -l walltime=0:30:00
+#PBS -l nodes=1:ppn=8
+#PBS -l mem=128gb
+
+#PBS -o results/01_postfilter/01_postfilter_analysis.out
+#PBS -e results/01_postfilter/01_postfilter_analysis.err
+
+set -euo pipefail
+cd $PBS_O_WORKDIR
+
+module load Miniconda3/23.10.0-1
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate visium_qc
+
+
+python 01_apply_filtering.py

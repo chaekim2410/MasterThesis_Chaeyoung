@@ -1,0 +1,25 @@
+#!/bin/bash
+#PBS -N domain
+#PBS -l walltime=3:00:00
+#PBS -l nodes=1:ppn=8
+#PBS -l mem=64gb
+
+#PBS -o results/02_annotation/domain.out
+#PBS -e results/02_annotation/domain.err
+
+set -euo pipefail
+cd $PBS_O_WORKDIR
+
+module load Miniconda3/23.10.0-1
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate visium_qc
+
+
+
+python /data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis/02a_celltype_annotation.py
+
+# python /data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis/2a2.py
+
+python /data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis/02b_add_domain_labels.py
+
+python /data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis/02c_validate_domain_labels.py

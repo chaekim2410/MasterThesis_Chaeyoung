@@ -1,0 +1,258 @@
+#!/bin/bash
+#PBS -N pyscenic_auc_run1_10
+#PBS -l walltime=72:00:00
+#PBS -l nodes=1:ppn=16
+#PBS -l mem=64gb
+#PBS -j oe
+#PBS -o /data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis/results/06_grnboost2/pyscenic_auc_run1_10.out
+
+set -euo pipefail
+
+cd "${PBS_O_WORKDIR}"
+
+module load Miniconda3/23.10.0-1
+source "$(conda info --base)/etc/profile.d/conda.sh"
+conda activate pyscenic_env
+
+
+####################################################
+# BASIC PATHS
+####################################################
+
+ROOT="/data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis"
+
+RESULT_DIR="${ROOT}/results/06_grnboost2"
+
+DB_DIR="${ROOT}/external_data"
+
+EXPRESSION_MTX="${RESULT_DIR}/grn_expression_matrix.tsv"
+
+
+####################################################
+# RUN OPTIONS
+####################################################
+
+# 현재 설정:
+# CTX는 실행하지 않고 AUCell만 실행
+RUN_CTX=false
+RUN_AUCELL=true
+
+NUM_WORKERS=16
+
+# true:
+# 이미 AUCell 결과 파일이 있으면 해당 run은 건너뜀
+#
+# false:
+# 기존 AUCell 결과가 있어도 다시 계산하여 덮어씀
+SKIP_COMPLETED=true
+
+
+####################################################
+# INPUT CHECK
+####################################################
+
+if [[ ! -f "${EXPRESSION_MTX}" ]]; then
+    echo "[ERROR] Expression matrix not found:"
+    echo "  ${EXPRESSION_MTX}"
+    exit 1
+fi
+
+
+echo "======================================"
+echo "pySCENIC CTX/AUCell run1-run10"
+echo "Started       : $(date)"
+echo "Host          : $(hostname)"
+echo "RUN_CTX       : ${RUN_CTX}"
+echo "RUN_AUCELL    : ${RUN_AUCELL}"
+echo "NUM_WORKERS   : ${NUM_WORKERS}"
+echo "Expression    : ${EXPRESSION_MTX}"
+echo "======================================"
+
+
+TOTAL_START=${SECONDS}
+FAILED_RUNS=()
+
+
+####################################################
+# RUN1 - RUN10
+####################################################
+
+for RUN_ID in $(seq 1 10); do
+
+    RUN_NAME="run${RUN_ID}"
+
+    STEP1="${RESULT_DIR}/${RUN_NAME}/step1"
+    STEP2="${RESULT_DIR}/${RUN_NAME}/step2"
+
+    # CTX input
+    ADJACENCY_INPUT="${STEP1}/consensus_regulons.csv"
+
+    # CTX output / AUCell input
+    REGULON_OUTPUT="${STEP2}/pyscenic_regulons.csv"
+
+    # AUCell output
+    AUCELL_OUTPUT="${STEP2}/pyscenic_aucell.csv"
+
+    # Separate log files for each run
+    CTX_LOG="${STEP2}/pyscenic_ctx.log"
+    AUCELL_LOG="${STEP2}/pyscenic_aucell.log"
+
+
+    echo ""
+    echo "======================================"
+    echo "${RUN_NAME}"
+    echo "Started : $(date)"
+    echo "STEP1   : ${STEP1}"
+    echo "STEP2   : ${STEP2}"
+    echo "======================================"
+
+
+    mkdir -p "${STEP2}"
+
+
+    ################################################
+    # STEP2: CTX
+    ################################################
+
+    if [[ "${RUN_CTX}" == "true" ]]; then
+
+        echo ""
+        echo "========== ${RUN_NAME} STEP2: CTX =========="
+
+        if [[ ! -f "${ADJACENCY_INPUT}" ]]; then
+            echo "[ERROR] CTX input not found:"
+            echo "  ${ADJACENCY_INPUT}"
+
+            FAILED_RUNS+=("${RUN_NAME}:missing_ctx_input")
+            continue
+        fi
+
+        CTX_START=${SECONDS}
+
+        if pyscenic ctx \
+            "${ADJACENCY_INPUT}" \
+            "${DB_DIR}/mm10_10kbp_up_10kbp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather" \
+            "${DB_DIR}/mm10_500bp_up_100bp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather" \
+            --annotations_fname "${DB_DIR}/motifs-v10nr_clust-nr.mgi-m0.001-o0.0.tbl" \
+            --expression_mtx_fname "${EXPRESSION_MTX}" \
+            --mode dask_multiprocessing \
+            --num_workers "${NUM_WORKERS}" \
+            --output "${REGULON_OUTPUT}" \
+            --mask_dropouts \
+            > "${CTX_LOG}" 2>&1
+        then
+            CTX_SECONDS=$((SECONDS - CTX_START))
+
+            echo "[OK] ${RUN_NAME} CTX completed."
+            echo "Runtime : ${CTX_SECONDS} sec"
+            echo "Output  : ${REGULON_OUTPUT}"
+            echo "Log     : ${CTX_LOG}"
+
+        else
+            CTX_SECONDS=$((SECONDS - CTX_START))
+
+            echo "[ERROR] ${RUN_NAME} CTX failed."
+            echo "Runtime : ${CTX_SECONDS} sec"
+            echo "Log     : ${CTX_LOG}"
+
+            FAILED_RUNS+=("${RUN_NAME}:ctx_failed")
+            continue
+        fi
+
+    else
+        echo ""
+        echo "[SKIP] ${RUN_NAME} CTX disabled: RUN_CTX=false"
+    fi
+
+
+    ################################################
+    # STEP3: AUCELL
+    ################################################
+
+    if [[ "${RUN_AUCELL}" == "true" ]]; then
+
+        echo ""
+        echo "========== ${RUN_NAME} STEP3: AUCell =========="
+
+        if [[ ! -f "${REGULON_OUTPUT}" ]]; then
+            echo "[ERROR] Regulon file not found:"
+            echo "  ${REGULON_OUTPUT}"
+
+            FAILED_RUNS+=("${RUN_NAME}:missing_regulons")
+            continue
+        fi
+
+        if [[ "${SKIP_COMPLETED}" == "true" && -s "${AUCELL_OUTPUT}" ]]; then
+            echo "[SKIP] Existing non-empty AUCell output:"
+            echo "  ${AUCELL_OUTPUT}"
+            continue
+        fi
+
+        AUCELL_START=${SECONDS}
+
+        if pyscenic aucell \
+            "${EXPRESSION_MTX}" \
+            "${REGULON_OUTPUT}" \
+            --num_workers "${NUM_WORKERS}" \
+            --output "${AUCELL_OUTPUT}" \
+            > "${AUCELL_LOG}" 2>&1
+        then
+            AUCELL_SECONDS=$((SECONDS - AUCELL_START))
+
+            echo "[OK] ${RUN_NAME} AUCell completed."
+            echo "Runtime : ${AUCELL_SECONDS} sec"
+            echo "Output  : ${AUCELL_OUTPUT}"
+            echo "Log     : ${AUCELL_LOG}"
+
+        else
+            AUCELL_SECONDS=$((SECONDS - AUCELL_START))
+
+            echo "[ERROR] ${RUN_NAME} AUCell failed."
+            echo "Runtime : ${AUCELL_SECONDS} sec"
+            echo "Log     : ${AUCELL_LOG}"
+
+            FAILED_RUNS+=("${RUN_NAME}:aucell_failed")
+            continue
+        fi
+
+    else
+        echo ""
+        echo "[SKIP] ${RUN_NAME} AUCell disabled: RUN_AUCELL=false"
+    fi
+
+
+    echo ""
+    echo "[DONE] ${RUN_NAME} finished: $(date)"
+
+done
+
+
+####################################################
+# FINAL SUMMARY
+####################################################
+
+TOTAL_SECONDS=$((SECONDS - TOTAL_START))
+
+echo ""
+echo "======================================"
+echo "Pipeline finished"
+echo "Finished : $(date)"
+echo "Runtime  : ${TOTAL_SECONDS} sec"
+echo "======================================"
+
+
+if [[ ${#FAILED_RUNS[@]} -gt 0 ]]; then
+
+    echo ""
+    echo "[ERROR] Some runs failed:"
+
+    for FAILED_ITEM in "${FAILED_RUNS[@]}"; do
+        echo "  - ${FAILED_ITEM}"
+    done
+
+    exit 1
+fi
+
+
+echo ""
+echo "[OK] Requested calculations completed for run1-run10."

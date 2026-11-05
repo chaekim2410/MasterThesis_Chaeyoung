@@ -1,0 +1,59 @@
+#!/bin/bash
+#PBS -N spagrn_ctx_auc
+#PBS -l nodes=1:ppn=16
+#PBS -l mem=128gb
+#PBS -l walltime=24:00:00
+#PBS -j oe
+
+set -euo pipefail
+
+PROJECT=/data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis
+
+module load Miniconda3/23.10.0-1
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate pyscenic_env
+
+cd ${PROJECT}
+
+echo "====================================="
+echo "SpaGRN pySCENIC ctx + AUCell"
+echo "Started : $(date)"
+echo "Host    : $(hostname)"
+echo "====================================="
+
+############################################################
+# pySCENIC ctx
+############################################################
+
+pyscenic ctx \
+${PROJECT}/results/07_spagrn/tmp_files/geary_ad_full.csv \
+${PROJECT}/external_data/mm10_10kbp_up_10kbp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather \
+${PROJECT}/external_data/mm10_500bp_up_100bp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather \
+--annotations_fname \
+${PROJECT}/external_data/motifs-v10nr_clust-nr.mgi-m0.001-o0.0.tbl \
+--expression_mtx_fname \
+${PROJECT}/results/04_sampling/d0/sampled_adatas/cluster_x_neighbor/sampled_adata.h5ad \
+--mode custom_multiprocessing \
+--output \
+${PROJECT}/results/07_spagrn/tmp_files/regulons_full.csv \
+--num_workers 16 \
+--mask_dropouts
+
+echo "====================================="
+echo "ctx finished."
+echo "====================================="
+
+############################################################
+# AUCell
+############################################################
+
+pyscenic aucell \
+${PROJECT}/results/04_sampling/d0/sampled_adatas/cluster_x_neighbor/sampled_adata.h5ad \
+${PROJECT}/results/07_spagrn/tmp_files/regulons_full.csv \
+--output \
+${PROJECT}/results/07_spagrn/tmp_files/auc_mtx_full.csv \
+--num_workers 16
+
+echo "====================================="
+echo "Finished : $(date)"
+echo "====================================="

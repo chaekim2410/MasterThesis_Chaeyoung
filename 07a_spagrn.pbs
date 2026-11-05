@@ -1,0 +1,41 @@
+#!/bin/bash
+#PBS -N SpaGRN
+#PBS -l walltime=72:00:00
+#PBS -l nodes=1:ppn=16
+#PBS -l mem=128gb
+#PBS -j oe
+#PBS -o /data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis/results/07_spagrn/07_spagrn3.out
+
+set -euo pipefail
+
+cd /data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis
+
+module load Miniconda3/23.10.0-1
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate spagrn_env
+
+echo "======================================"
+echo "SpaGRN High-resolution"
+echo "Started : $(date)"
+echo "Host    : $(hostname)"
+echo "Python  : $(which python)"
+echo "======================================"
+
+python - <<'PY'
+import sys
+import spagrn
+import hotspot
+import pyscenic
+import pyarrow
+
+print("Python   :", sys.version)
+print("Hotspot  :", hotspot.__version__)
+print("pySCENIC :", pyscenic.__version__)
+print("pyarrow  :", pyarrow.__version__)
+PY
+
+python 07a_spaGRN_core.py
+
+echo "======================================"
+echo "Finished : $(date)"
+echo "======================================"

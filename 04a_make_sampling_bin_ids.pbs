@@ -1,0 +1,18 @@
+#!/bin/bash
+#PBS -N make_bin_ids
+#PBS -l walltime=1:00:00
+#PBS -l nodes=1:ppn=8
+#PBS -l mem=32gb
+
+#PBS -o ./results/04_sampling/make_bin_ids.out
+#PBS -e ./results/04_sampling/make_bin_ids.err
+
+set -euo pipefail
+cd $PBS_O_WORKDIR
+
+module load Miniconda3/23.10.0-1
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate visium_qc
+
+
+python /data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis/04a_make_sampling_bin_ids.py

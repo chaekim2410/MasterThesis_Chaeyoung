@@ -1,0 +1,18 @@
+#!/bin/bash
+#PBS -N prefilter_qc
+#PBS -l walltime=00:30:00
+#PBS -l nodes=1:ppn=8
+#PBS -l mem=64gb
+
+#PBS -o results/00_prefilter_qc/prefilter_qc.out
+#PBS -e results/00_prefilter_qc/prefilter_qc.err
+
+set -euo pipefail
+cd $PBS_O_WORKDIR
+
+module load Miniconda3/23.10.0-1
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate visium_qc
+
+
+python 00_prefilter_qc.py

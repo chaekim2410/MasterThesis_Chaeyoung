@@ -1,0 +1,64 @@
+#!/bin/bash
+#PBS -N grnboost2_chunked_run10
+#PBS -l nodes=1:ppn=8
+#PBS -l mem=120gb
+#PBS -l walltime=20:00:00
+#PBS -t 0-9
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+
+module load Miniconda3/23.10.0-1
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate pyscenic_env
+
+echo "========================================"
+echo "Job started : $(date)"
+echo "Hostname    : $(hostname)"
+echo "Working dir : $PWD"
+echo "Python      : $(which python)"
+echo "Python ver  : $(python --version)"
+echo "Conda env   : $CONDA_DEFAULT_ENV"
+echo "========================================"
+
+SECONDS=0
+
+# --------------------------------------------------
+# PBS array index
+# --------------------------------------------------
+if [ -n "${PBS_ARRAYID:-}" ]; then
+    export CHUNK_ID=${PBS_ARRAYID}
+elif [ -n "${PBS_ARRAY_INDEX:-}" ]; then
+    export CHUNK_ID=${PBS_ARRAY_INDEX}
+else
+    echo "ERROR: Cannot determine array index."
+    exit 1
+fi
+
+export N_CHUNKS=10
+export NUM_WORKERS=8
+
+# --------------------------------------------------
+# Dask temporary directory
+# --------------------------------------------------
+export DASK_TEMPORARY_DIRECTORY="$VSC_SCRATCH/dask-worker-space-${PBS_JOBID}-${CHUNK_ID}"
+
+mkdir -p "$DASK_TEMPORARY_DIRECTORY"
+
+echo "Chunk ID              : $CHUNK_ID"
+echo "Number of chunks      : $N_CHUNKS"
+echo "Dask workers          : $NUM_WORKERS"
+echo "Dask temp             : $DASK_TEMPORARY_DIRECTORY"
+
+echo
+echo "[RUN] GRNBoost2 chunk ${CHUNK_ID}"
+echo
+
+python 06a_grnboost2_chunked.py
+
+echo
+echo "[DONE] Chunk ${CHUNK_ID} finished."
+echo "Elapsed : ${SECONDS} sec"
+
+echo "Finished : $(date)"

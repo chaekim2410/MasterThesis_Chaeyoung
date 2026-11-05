@@ -1,0 +1,31 @@
+#!/bin/bash
+#PBS -N regulon_occurrence
+#PBS -l nodes=1:ppn=4
+#PBS -l walltime=02:00:00
+#PBS -l mem=16gb
+#PBS -j oe
+#PBS -o /data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis/results/06_grnboost2/regulon_occurrence/regulon_occurrence.pbs.log
+
+set -euo pipefail
+
+BASE="/data/gent/vo/000/gvo00027/CBIGR/25KCY_master_thesis"
+SCRIPT="${BASE}/07_regulon_occurrence_analysis.py"
+OUTDIR="${BASE}/results/06_grnboost2/regulon_occurrence"
+INPUT_GLOB="${BASE}/results/06_grnboost2/run*/step2/pyscenic_regulons.csv"
+
+mkdir -p "${OUTDIR}"
+cd "${BASE}"
+
+echo "Job started: $(date)"
+echo "Host: $(hostname)"
+
+module load Miniconda3/23.10.0-1
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate pyscenic_env
+
+python "${SCRIPT}" \
+  --input-glob "${INPUT_GLOB}" \
+  --output-dir "${OUTDIR}" \
+  --expected-runs 10
+
+echo "Job finished: $(date)"
