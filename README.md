@@ -64,7 +64,7 @@ The project used databases at distinct points in the workflow rather than treati
 | Annotation | [Allen Whole Mouse Brain taxonomy CCN20230722](https://brain-map.org/our-research/cell-type-taxonomies/whole-mouse-brain-taxonomy) through MapMyCells | Reference mapping of bins to cell types; labels were consolidated into broad anatomical regions |
 | Candidate regulators | [Aerts Lab mouse TF list](https://resources.aertslab.org/cistarget/tf_lists/) | Restricted candidate regulators to known mouse TFs present in the expression matrix |
 | Regulon construction | [Aerts Lab cisTarget mm10/refseq_r80 databases](https://resources.aertslab.org/cistarget/databases/mus_musculus/mm10/refseq_r80/) and motif-to-TF annotations | Removed candidate associations without motif enrichment support before AUCell scoring |
-| Curated relationships | [CollecTRI through OmniPath](https://omnipathdb.org/) | Asked whether an inferred relationship had been reported in curated regulatory knowledge; the mouse network was obtained by orthology translation |
+| Curated relationships | [CollecTRI through OmniPath](https://omnipathdb.org/) | Compared inferred relationships with a preprocessed mouse-symbol TF–target CSV; the checked files do not document how this CSV was downloaded or converted |
 | Perturbation response | [KnockTF 2.0](https://pmc.ncbi.nlm.nih.gov/articles/PMC10767813/) | Asked whether target expression changed after the corresponding TF was knocked down or knocked out; mouse pairs with p < 0.05 were retained |
 | Physical binding | [ChIP-Atlas Target Genes](https://chip-atlas.org/target_genes) | Asked whether public ChIP-seq data supported TF binding within ±5 kb of the target transcription start site |
 | Functional interpretation | [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost) | Gene Ontology biological-process enrichment for high-ranking consensus regulons, using the measured gene panel as background |
@@ -78,18 +78,16 @@ This evidence-aware integration connected public spatial-transcriptomics data an
 
 ## Repository contents
 
-The numbered Python and PBS files form the HPC pipeline in execution order. The stages are grouped into folders by the biological question they answer; the missing `03` reflects a removed intermediate stage rather than a missing analysis step.
+The six folders below follow the analysis from raw spatial data to validation. Open a folder for its file-by-file guide, required inputs, and software notes. Folder numbers label stages; the original script numbers are retained inside them.
 
 | Analysis group | Files | Purpose |
 | --- | --- | --- |
-| Data preparation and annotation | [`pipeline/01_preprocessing_annotation/`](pipeline/01_preprocessing_annotation/) | Load Space Ranger output, apply quality control, and attach cell-type and anatomical labels |
-| Sampling and shared inputs | [`pipeline/02_sampling_inputs/`](pipeline/02_sampling_inputs/) | Draw and validate the 30,000-bin stratified sample and prepare common inference inputs |
-| Non-spatial reference method | [`pipeline/03_grnboost2/`](pipeline/03_grnboost2/) | Run GRNBoost2 in target-gene chunks, merge results, apply cisTarget/AUCell, and build recurrent regulons |
-| SpaGRN | [`pipeline/04_spaGRN/`](pipeline/04_spaGRN/) | Run SpaGRN and apply the common cisTarget/AUCell framework |
-| SpaGTL | [`pipeline/05_spaGTL/`](pipeline/05_spaGTL/) | Run SpaGTL across seeds and apply the common cisTarget/AUCell framework |
-| Reproducibility and validation | [`notebooks/reproducibility_final.ipynb`](notebooks/reproducibility_final.ipynb) | Repeated-run stability of GRNBoost2 and SpaGTL |
-| Reproducibility and validation | [`notebooks/ground_validation_final_final2.ipynb`](notebooks/ground_validation_final_final2.ipynb) | Comparison with CollecTRI, KnockTF, and ChIP-Atlas, plus GO interpretation |
-| Reproducibility and validation | [`notebooks/spatial_broad_region.ipynb`](notebooks/spatial_broad_region.ipynb) | Internal spatial organization and broad-region comparison with Allen ISH |
+| 00 · Preparation | [`pipeline/00_preprocessing_annotation/`](pipeline/00_preprocessing_annotation/) | Quality control, filtering, and brain cell-type labels |
+| 01 · Sampling | [`pipeline/01_sampling_inputs/`](pipeline/01_sampling_inputs/) | Choose and check 30,000 bins; prepare common inputs |
+| 02 · GRNBoost2 | [`pipeline/02_grnboost2/`](pipeline/02_grnboost2/) | Infer expression-only networks and score regulons |
+| 03 · SpaGRN | [`pipeline/03_spaGRN/`](pipeline/03_spaGRN/) | Infer spatial networks and score regulons |
+| 04 · SpaGTL | [`pipeline/04_spaGTL/`](pipeline/04_spaGTL/) | Fine-tune the spatial model and score regulons |
+| 05 · Validation | [`pipeline/05_validation/`](pipeline/05_validation/) | Compare repeatability, independent evidence, and tissue patterns |
 
 Notebook outputs were cleared to keep the files small enough for GitHub to render. The analysis code and explanatory markdown are unchanged; the main result figures are shown above. Each notebook currently defines an absolute `BASE` path near the top. Change that path to the local analysis directory before running it.
 
@@ -97,11 +95,7 @@ Notebook outputs were cleared to keep the files small enough for GitHub to rende
 
 The pipeline was run on the Ghent University HPC using PBS jobs and separate Conda environments for preprocessing, pySCENIC, SpaGRN, and SpaGTL. SpaGTL requested an NVIDIA GPU with CUDA 12.1.1; the other main inference jobs used CPUs.
 
-The software stack includes:
-
-- GRN inference and regulon scoring: [Arboreto/GRNBoost2](https://github.com/aertslab/arboreto), [SpaGRN](https://github.com/BGI-Qingdao/SpaGRN), [SpaGTL](https://github.com/zccqq/SpaGTL), [pySCENIC](https://github.com/aertslab/pySCENIC), and `ctxcore`
-- Data handling and statistics: Python, NumPy, pandas, SciPy, scikit-learn, Scanpy, AnnData, Dask, Kneed, and g:Profiler's Python client
-- Modeling and visualization: PyTorch, Matplotlib, and Seaborn
+The main inference tools were [Arboreto/GRNBoost2](https://github.com/aertslab/arboreto), [SpaGRN](https://github.com/BGI-Qingdao/SpaGRN), [SpaGTL](https://github.com/zccqq/SpaGTL), and [pySCENIC](https://github.com/aertslab/pySCENIC). Each stage's folder README identifies its other important packages and input files.
 
 Exact package versions were not captured in a portable lock file. The PBS scripts preserve the original HPC environment names and resource requests, and several scripts contain project-specific absolute paths under `/data/gent/...`. Update those paths before attempting a full rerun.
 
