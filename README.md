@@ -56,6 +56,14 @@ That advantage was specific to spatial interpretation. Different SpaGRN regulons
 
 ![Spatial coherence and similarity among regulon maps](assets/spatial_coherence.png)
 
+### Spatial information helped reveal tissue organization, with an important limitation
+
+Among the 22 TFs recovered by all three methods, we compared the ordering of three broad regions—cerebral cortex (CTX), cerebral nuclei (CNU), and interbrain (IB)—based on mean inferred regulon activity with the corresponding ordering of TF expression in the Allen Mouse Brain Atlas ISH data. The right panel summarizes whether each method reproduced the Allen regional ordering as the first, second, or third-ranked region.
+
+SpaGTL most often reproduced the Allen regional ordering, followed by SpaGRN, whereas GRNBoost2 showed fewer first-ranked matches and more third-ranked outcomes. This indicates that spatially informed methods were better aligned with broad anatomical expression patterns in this comparison. The result supports regional or anatomical compatibility of the inferred regulon activity, but it does not establish accuracy of individual TF–target edges.
+
+![Spatial coherence and similarity among regulon maps](assets/regional_agreement.png)
+
 ## Data and knowledge resources
 
 The project used databases at distinct points in the workflow rather than treating them as one pooled validation set.
