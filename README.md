@@ -85,7 +85,8 @@ The numbered Python and PBS files form the HPC pipeline in execution order. The 
 | Data preparation and annotation | [`pipeline/01_preprocessing_annotation/`](pipeline/01_preprocessing_annotation/) | Load Space Ranger output, apply quality control, and attach cell-type and anatomical labels |
 | Sampling and shared inputs | [`pipeline/02_sampling_inputs/`](pipeline/02_sampling_inputs/) | Draw and validate the 30,000-bin stratified sample and prepare common inference inputs |
 | Non-spatial reference method | [`pipeline/03_grnboost2/`](pipeline/03_grnboost2/) | Run GRNBoost2 in target-gene chunks, merge results, apply cisTarget/AUCell, and build recurrent regulons |
-| Spatial inference methods | [`pipeline/04_spatial_methods/`](pipeline/04_spatial_methods/) | Run SpaGRN and SpaGTL, then apply the same cisTarget/AUCell framework for comparable regulons |
+| SpaGRN | [`pipeline/04_spaGRN/`](pipeline/04_spaGRN/) | Run SpaGRN and apply the common cisTarget/AUCell framework |
+| SpaGTL | [`pipeline/05_spaGTL/`](pipeline/05_spaGTL/) | Run SpaGTL across seeds and apply the common cisTarget/AUCell framework |
 | Reproducibility and validation | [`notebooks/reproducibility_final.ipynb`](notebooks/reproducibility_final.ipynb) | Repeated-run stability of GRNBoost2 and SpaGTL |
 | Reproducibility and validation | [`notebooks/ground_validation_final_final2.ipynb`](notebooks/ground_validation_final_final2.ipynb) | Comparison with CollecTRI, KnockTF, and ChIP-Atlas, plus GO interpretation |
 | Reproducibility and validation | [`notebooks/spatial_broad_region.ipynb`](notebooks/spatial_broad_region.ipynb) | Internal spatial organization and broad-region comparison with Allen ISH |
