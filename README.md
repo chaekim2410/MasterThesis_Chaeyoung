@@ -2,6 +2,8 @@
 
 Master's thesis project by Chaeyoung Kim, MSc Bioinformatics, Ghent University, academic year 2025–2026.
 
+**Computing environment:** Preprocessing and network inference ran on the Ghent University high-performance computing (HPC) cluster. The repository includes the original PBS batch scripts alongside the Python code. GRNBoost2 and SpaGRN used CPU jobs; SpaGTL training requested an NVIDIA GPU. Final comparison and validation were organized in Jupyter notebooks.
+
 This project asks whether adding tissue location to gene regulatory network (GRN) inference produces more trustworthy transcription factor (TF)–target gene relationships. Three strategies were compared on the same 10x Genomics Visium HD mouse brain section: expression-only inference with GRNBoost2, spatial-statistics-based inference with SpaGRN, and spatially constrained transfer learning with SpaGTL.
 
 The main conclusion is deliberately narrower than “spatial is more accurate.” Spatially informed methods produced more spatially organized target-gene programs and, in some comparisons, better agreement with broad anatomical expression patterns. They did not consistently improve edge reproducibility or support from independent regulatory evidence. Spatial organization and TF–target edge accuracy therefore need to be evaluated separately.
@@ -78,7 +80,7 @@ This evidence-aware integration connected public spatial-transcriptomics data an
 
 ## Repository contents
 
-The six folders below follow the analysis from raw spatial data to validation. Open a folder for its file-by-file guide, required inputs, and software notes. Folder numbers label stages; the original script numbers are retained inside them.
+The six folders below follow the analysis from raw spatial data to validation. Each folder explains its Python files, PBS jobs, required inputs, and software. Folder numbers label stages; the original script numbers are retained inside them.
 
 | Analysis group | Files | Purpose |
 | --- | --- | --- |
@@ -91,9 +93,9 @@ The six folders below follow the analysis from raw spatial data to validation. O
 
 Notebook outputs were cleared to keep the files small enough for GitHub to render. The analysis code and explanatory markdown are unchanged; the main result figures are shown above. Each notebook currently defines an absolute `BASE` path near the top. Change that path to the local analysis directory before running it.
 
-## Software
+## HPC execution and software
 
-The pipeline was run on the Ghent University HPC using PBS jobs and separate Conda environments for preprocessing, pySCENIC, SpaGRN, and SpaGTL. SpaGTL requested an NVIDIA GPU with CUDA 12.1.1; the other main inference jobs used CPUs.
+The `.pbs` files record the batch jobs submitted to the Ghent University HPC cluster, including requested CPU cores, memory, wall time, environment setup, and command lines. Preprocessing used `visium_qc`; GRNBoost2 and motif/AUCell jobs used `pyscenic_env`; SpaGRN inference used `spagrn_env`; SpaGTL training used a separate `spagtl_env` with one NVIDIA GPU and CUDA 12.1.1. The downstream validation notebooks use locally stored HPC outputs and external reference data.
 
 The main inference tools were [Arboreto/GRNBoost2](https://github.com/aertslab/arboreto), [SpaGRN](https://github.com/BGI-Qingdao/SpaGRN), [SpaGTL](https://github.com/zccqq/SpaGTL), and [pySCENIC](https://github.com/aertslab/pySCENIC). Each stage's folder README identifies its other important packages and input files.
 
