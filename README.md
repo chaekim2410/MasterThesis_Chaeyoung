@@ -1,5 +1,7 @@
 # Evaluating gene regulatory network inference for spatial transcriptomics
 
+<p align="center"><strong>Mouse Brain Visium HD</strong></p>
+
 Master's thesis project by Chaeyoung Kim, MSc Bioinformatics, Ghent University, academic year 2025–2026.
 
 **Computing environment:** Preprocessing and network inference ran on the Ghent University high-performance computing (HPC) cluster. The repository includes the original PBS batch scripts alongside the Python code. GRNBoost2 and SpaGRN used CPU jobs; SpaGTL training requested an NVIDIA GPU. Final comparison and validation were organized in Jupyter notebooks.
@@ -10,13 +12,13 @@ This project asks whether adding tissue location to gene regulatory network (GRN
 
 The analysis focuses on transcriptional regulatory networks: TFs are connected to genes whose expression patterns are predicted to be regulated by them. This is a narrower view than a broad gene regulatory network, which can also include cofactors, regulatory elements, chromatin state, and feedback through gene products.
 
-<img src="assets/figures/grn_and_trn_concept.png" alt="Broad gene regulatory network and transcriptional regulatory network" width="700">
+<p align="center"><img src="assets/figures/grn_and_trn_concept.png" alt="Broad gene regulatory network and transcriptional regulatory network" width="700"></p>
 
 *Conceptual distinction between a broad gene regulatory network and the TF–target transcriptional networks evaluated here.*
 
 The main conclusion is deliberately narrower than “spatial is more accurate.” Spatially informed methods produced more spatially organized target-gene programs and, in some comparisons, better agreement with broad anatomical expression patterns. They did not consistently improve edge reproducibility or support from independent regulatory evidence. Spatial organization and TF–target edge accuracy therefore need to be evaluated separately.
 
-![Summary of the main comparison](assets/conclusion.png)
+<p align="center"><img src="assets/conclusion.png" alt="Summary of the main comparison" width="850"></p>
 
 ## Study design
 
@@ -24,7 +26,7 @@ The analysis used the public [Visium HD mouse brain fresh-frozen dataset](https:
 
 [MapMyCells](https://brain-map.org/our-research/cell-type-taxonomies/whole-mouse-brain-taxonomy) with the Whole Mouse Brain taxonomy CCN20230722 provided reference-based cell-type labels. All three inference methods then received the same sampled expression matrix and candidate TF list.
 
-<img src="assets/figures/inference_methods_overview.png" alt="Overview of the three GRN inference methods" width="520">
+<p align="center"><img src="assets/figures/inference_methods_overview.png" alt="Overview of the three GRN inference methods" width="520"></p>
 
 *The three methods differ in the information used during inference: expression alone for GRNBoost2, expression plus spatial structure for SpaGRN, and expression, spatial coordinates, and pretrained weights for SpaGTL.*
 
@@ -34,13 +36,13 @@ The analysis used the public [Visium HD mouse brain fresh-frozen dataset](https:
 | SpaGRN | Expression and spatial coordinates | 1 | Spatial co-variation between a TF and target |
 | SpaGTL | Expression, coordinates, and pretrained weights | 10 | Attention-derived gene relationship score |
 
-<img src="assets/figures/study_workflow.png" alt="Study workflow from Visium HD preprocessing to validation" width="560">
+<p align="center"><img src="assets/figures/study_workflow.png" alt="Study workflow from Visium HD preprocessing to validation" width="560"></p>
 
 *Study workflow from spatial-transcriptomics preprocessing through network inference, common motif pruning and AUCell scoring, and downstream validation.*
 
 Every candidate network passed through the same downstream steps. [pySCENIC](https://pyscenic.readthedocs.io/en/stable/) used cisTarget motif enrichment to retain motif-supported regulons, and AUCell summarized each regulon's target-gene activity in every bin.
 
-<img src="assets/figures/regulon_activity_workflow.png" alt="Regulon activity workflow" width="700">
+<p align="center"><img src="assets/figures/regulon_activity_workflow.png" alt="Regulon activity workflow" width="700"></p>
 
 *Candidate TF–target associations are motif-pruned, converted into regulons, scored with AUCell across bins, and represented as regulon activity maps. This common post-processing made the comparison focus on the inference stage rather than different downstream workflows.*
 
@@ -60,13 +62,13 @@ There is no complete ground-truth regulatory network for this tissue. The evalua
 
 GRNBoost2 was more stable across a broad part of the ranked network, whereas SpaGTL was most stable among its highest-ranked edges. In both stochastic methods, recovering the same TF across runs was more common than reconnecting that TF to exactly the same targets. A single run should therefore be interpreted as one network supported by the data, and recurrent edges are more suitable for downstream analysis.
 
-![Agreement between repeated runs](assets/reproducibility.png)
+<p align="center"><img src="assets/reproducibility.png" alt="Agreement between repeated runs" width="850"></p>
 
 ### The strongest method depended on the biological evidence
 
 All three methods recovered more reference-supported relationships than expected from random edge selection, although absolute precision remained low. GRNBoost2 received the strongest support from curated literature and TF-binding evidence. SpaGRN received the strongest support from expression changes after TF perturbation. The change in ranking reflects both the inferred networks and what each reference can observe; it does not identify a universally most accurate method.
 
-![Support from three independent evidence sources](assets/external_reference_support.png)
+<p align="center"><img src="assets/external_reference_support.png" alt="Support from three independent evidence sources" width="850"></p>
 
 ### Spatial information helped reveal tissue organization, with an important limitation
 
@@ -74,7 +76,7 @@ Among the 22 TFs recovered by all methods, SpaGRN produced the strongest spatial
 
 That advantage was specific to spatial interpretation. Different SpaGRN regulons often produced similar broad tissue maps, with a median cross-regulon correlation of about 0.78, compared with about 0.25 for SpaGTL and approximately zero for GRNBoost2. Some GRNBoost2 regulons were spatially organized even though coordinates were never supplied, because co-expressed targets can concentrate in the same cell populations or regions. Strong spatial coherence therefore does not establish TF-specific regulation.
 
-![Spatial coherence and similarity among regulon maps](assets/spatial_coherence.png)
+<p align="center"><img src="assets/spatial_coherence.png" alt="Spatial coherence and similarity among regulon maps" width="850"></p>
 
 ### Spatial information helped reveal tissue organization, with an important limitation
 
@@ -82,7 +84,7 @@ Among the 22 TFs recovered by all three methods, we compared the ordering of thr
 
 SpaGTL most often reproduced the Allen regional ordering, followed by SpaGRN, whereas GRNBoost2 showed fewer first-ranked matches and more third-ranked outcomes. This indicates that spatially informed methods were better aligned with broad anatomical expression patterns in this comparison. The result supports regional or anatomical compatibility of the inferred regulon activity, but it does not establish accuracy of individual TF–target edges.
 
-![Spatial coherence and similarity among regulon maps](assets/regional_agreement.png)
+<p align="center"><img src="assets/regional_agreement.png" alt="Regional agreement with external TF expression" width="850"></p>
 
 ## Data and knowledge resources
 
