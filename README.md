@@ -1,6 +1,6 @@
-# Evaluating gene regulatory network inference for spatial transcriptomics
+# Benchmarking Gene Regulatory Network Inference on Visium HD Mouse Brain
 
-<p align="center"><strong>Mouse Brain Visium HD</strong></p>
+<p align="center"><strong>Expression-only and spatially informed methods</strong></p>
 
 Master's thesis project by Chaeyoung Kim, MSc Bioinformatics, Ghent University, academic year 2025–2026.
 
