@@ -34,6 +34,10 @@ The analysis used the public [Visium HD mouse brain fresh-frozen dataset](https:
 | SpaGRN | Expression and spatial coordinates | 1 | Spatial co-variation between a TF and target |
 | SpaGTL | Expression, coordinates, and pretrained weights | 10 | Attention-derived gene relationship score |
 
+<p align="center"><img src="assets/figures/inference_methods_overview.png" alt="Overview of the three GRN inference methods" width="700"></p>
+
+*Detailed overview of the inputs, spatial information, and outputs used by GRNBoost2, SpaGRN, and SpaGTL.*
+
 *Study workflow from spatial-transcriptomics preprocessing through network inference, common motif pruning and AUCell scoring, and downstream validation.*
 
 Every candidate network passed through the same downstream steps. [pySCENIC](https://pyscenic.readthedocs.io/en/stable/) used cisTarget motif enrichment to retain motif-supported regulons, and AUCell summarized each regulon's target-gene activity in every bin.
