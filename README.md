@@ -4,6 +4,8 @@ Master's thesis project by Chaeyoung Kim, MSc Bioinformatics, Ghent University, 
 
 **Computing environment:** Preprocessing and network inference ran on the Ghent University high-performance computing (HPC) cluster. The repository includes the original PBS batch scripts alongside the Python code. GRNBoost2 and SpaGRN used CPU jobs; SpaGTL training requested an NVIDIA GPU. Final comparison and validation were organized in Jupyter notebooks.
 
+**Thesis:** [Read the complete master's thesis PDF](thesis/Master_Thesis_Chaeyoung_Kim.pdf).
+
 This project asks whether adding tissue location to gene regulatory network (GRN) inference produces more trustworthy transcription factor (TF)–target gene relationships. Three strategies were compared on the same 10x Genomics Visium HD mouse brain section: expression-only inference with GRNBoost2, spatial-statistics-based inference with SpaGRN, and spatially constrained transfer learning with SpaGTL.
 
 The analysis focuses on transcriptional regulatory networks: TFs are connected to genes whose expression patterns are predicted to be regulated by them. This is a narrower view than a broad gene regulatory network, which can also include cofactors, regulatory elements, chromatin state, and feedback through gene products.
