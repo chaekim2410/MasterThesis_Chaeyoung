@@ -26,6 +26,10 @@ The analysis used the public [Visium HD mouse brain fresh-frozen dataset](https:
 
 [MapMyCells](https://brain-map.org/our-research/cell-type-taxonomies/whole-mouse-brain-taxonomy) with the Whole Mouse Brain taxonomy CCN20230722 provided reference-based cell-type labels. All three inference methods then received the same sampled expression matrix and candidate TF list.
 
+<p align="center"><img src="assets/figures/inference_methods_overview.png" alt="Overview of the three GRN inference methods" width="700"></p>
+
+*Detailed overview of the inputs, spatial information, and outputs used by GRNBoost2, SpaGRN, and SpaGTL.*
+
 <p align="center"><img src="assets/figures/study_workflow.png" alt="Study workflow from Visium HD preprocessing to validation" width="700"></p>
 
 | Method | Information used during inference | Runs | Candidate edge score |
@@ -33,10 +37,6 @@ The analysis used the public [Visium HD mouse brain fresh-frozen dataset](https:
 | GRNBoost2 | Gene expression only | 10 | Importance in gradient-boosted regression |
 | SpaGRN | Expression and spatial coordinates | 1 | Spatial co-variation between a TF and target |
 | SpaGTL | Expression, coordinates, and pretrained weights | 10 | Attention-derived gene relationship score |
-
-<p align="center"><img src="assets/figures/inference_methods_overview.png" alt="Overview of the three GRN inference methods" width="700"></p>
-
-*Detailed overview of the inputs, spatial information, and outputs used by GRNBoost2, SpaGRN, and SpaGTL.*
 
 *Study workflow from spatial-transcriptomics preprocessing through network inference, common motif pruning and AUCell scoring, and downstream validation.*
 
