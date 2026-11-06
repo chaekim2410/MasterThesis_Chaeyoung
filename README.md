@@ -8,9 +8,9 @@ This project asks whether adding tissue location to gene regulatory network (GRN
 
 The analysis focuses on transcriptional regulatory networks: TFs are connected to genes whose expression patterns are predicted to be regulated by them. This is a narrower view than a broad gene regulatory network, which can also include cofactors, regulatory elements, chromatin state, and feedback through gene products.
 
-<p align="center"><img src="assets/figures/inference_methods_overview.png" alt="Overview of the three GRN inference methods" width="700"></p>
+<p align="center"><img src="assets/figures/spatial_transcriptomics_grn_inference.png" alt="Spatial transcriptomics data with bin coordinates" width="850"></p>
 
-*The three methods differ in the information used during inference: expression alone for GRNBoost2, expression plus spatial structure for SpaGRN, and expression, spatial coordinates, and pretrained weights for SpaGTL.*
+*The Visium HD input combines a gene-expression matrix with the spatial coordinates of each tissue bin.*
 
 <p align="center"><img src="assets/figures/grn_and_trn_concept.png" alt="Broad gene regulatory network and transcriptional regulatory network" width="850"></p>
 
