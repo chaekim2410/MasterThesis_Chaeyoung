@@ -12,6 +12,10 @@ This project asks whether adding tissue location to gene regulatory network (GRN
 
 The analysis focuses on transcriptional regulatory networks: TFs are connected to genes whose expression patterns are predicted to be regulated by them. This is a narrower view than a broad gene regulatory network, which can also include cofactors, regulatory elements, chromatin state, and feedback through gene products.
 
+<p align="center"><img src="assets/figures/transcriptomics_to_grn_concept.png" alt="Transcriptomics and spatial transcriptomics inputs for GRN inference" width="900"></p>
+
+*Transcriptomic and spatial-transcriptomic measurements provide inputs for GRN inference models, which produce ranked TF–target gene associations.*
+
 <p align="center"><img src="assets/figures/grn_and_trn_concept.png" alt="Broad gene regulatory network and transcriptional regulatory network" width="700"></p>
 
 *Conceptual distinction between a broad gene regulatory network and the TF–target transcriptional networks evaluated here.*
