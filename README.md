@@ -6,6 +6,12 @@ Master's thesis project by Chaeyoung Kim, MSc Bioinformatics, Ghent University, 
 
 This project asks whether adding tissue location to gene regulatory network (GRN) inference produces more trustworthy transcription factor (TF)–target gene relationships. Three strategies were compared on the same 10x Genomics Visium HD mouse brain section: expression-only inference with GRNBoost2, spatial-statistics-based inference with SpaGRN, and spatially constrained transfer learning with SpaGTL.
 
+The analysis focuses on transcriptional regulatory networks: TFs are connected to genes whose expression patterns are predicted to be regulated by them. This is a narrower view than a broad gene regulatory network, which can also include cofactors, regulatory elements, chromatin state, and feedback through gene products.
+
+![Broad gene regulatory network and transcriptional regulatory network](assets/figures/grn_and_trn_concept.png)
+
+*Conceptual distinction between a broad gene regulatory network and the TF–target transcriptional networks evaluated here.*
+
 The main conclusion is deliberately narrower than “spatial is more accurate.” Spatially informed methods produced more spatially organized target-gene programs and, in some comparisons, better agreement with broad anatomical expression patterns. They did not consistently improve edge reproducibility or support from independent regulatory evidence. Spatial organization and TF–target edge accuracy therefore need to be evaluated separately.
 
 ![Summary of the main comparison](assets/conclusion.png)
@@ -16,13 +22,25 @@ The analysis used the public [Visium HD mouse brain fresh-frozen dataset](https:
 
 [MapMyCells](https://brain-map.org/our-research/cell-type-taxonomies/whole-mouse-brain-taxonomy) with the Whole Mouse Brain taxonomy CCN20230722 provided reference-based cell-type labels. All three inference methods then received the same sampled expression matrix and candidate TF list.
 
+![Overview of the three GRN inference methods](assets/figures/inference_methods_overview.png)
+
+*The three methods differ in the information used during inference: expression alone for GRNBoost2, expression plus spatial structure for SpaGRN, and expression, spatial coordinates, and pretrained weights for SpaGTL.*
+
 | Method | Information used during inference | Runs | Candidate edge score |
 | --- | --- | ---: | --- |
 | GRNBoost2 | Gene expression only | 10 | Importance in gradient-boosted regression |
 | SpaGRN | Expression and spatial coordinates | 1 | Spatial co-variation between a TF and target |
 | SpaGTL | Expression, coordinates, and pretrained weights | 10 | Attention-derived gene relationship score |
 
-Every candidate network passed through the same downstream steps. [pySCENIC](https://pyscenic.readthedocs.io/en/stable/) used cisTarget motif enrichment to retain motif-supported regulons, and AUCell summarized each regulon's target-gene activity in every bin. This common post-processing made the comparison focus on the inference stage rather than different downstream workflows.
+![Study workflow from Visium HD preprocessing to validation](assets/figures/study_workflow.png)
+
+*Study workflow from spatial-transcriptomics preprocessing through network inference, common motif pruning and AUCell scoring, and downstream validation.*
+
+Every candidate network passed through the same downstream steps. [pySCENIC](https://pyscenic.readthedocs.io/en/stable/) used cisTarget motif enrichment to retain motif-supported regulons, and AUCell summarized each regulon's target-gene activity in every bin.
+
+![Regulon activity workflow](assets/figures/regulon_activity_workflow.png)
+
+*Candidate TF–target associations are motif-pruned, converted into regulons, scored with AUCell across bins, and represented as regulon activity maps. This common post-processing made the comparison focus on the inference stage rather than different downstream workflows.*
 
 ## How the networks were evaluated
 
